@@ -8,7 +8,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven {
-        name = "DidResolverGitHubPackages"
+        name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/e-id-admin/didresolver-kotlin")
     }
     maven {
@@ -22,7 +22,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.mock-server:mockserver-netty-no-dependencies:5.14.0")
-    implementation("ch.admin.eid:didresolver:1.0.0")
+    implementation("ch.admin.eid:didresolver:1.0.1")
     //implementation(files("/Users/u80850818/Documents/GitHub/e-id-admin/didresolver-kotlin/build/libs/didresolver-kotlin-0.0.6.jar"))
     implementation("ch.admin.bj.swiyu:didtoolbox:1.0.0")
     implementation("com.google.code.gson:gson:2.10.1")
