@@ -25,7 +25,7 @@ repositories {
 }
 ```
 
-For current/latest versions of the required dependencies, just rely on the relevant [`didresolver` GitHub packages](https://github.com/swiyu-admin-ch/didresolver-kotlin/packages/2242843)
+For current/latest versions of the required dependencies, just rely on the relevant [`didresolver` GitHub packages](https://github.com/swiyu-admin-ch/didresolver-kotlin/packages/2414675)
 ```kotlin
 // file: build.gradle.kts
 dependencies {
