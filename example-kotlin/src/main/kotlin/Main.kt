@@ -3,8 +3,6 @@ import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl
 import ch.admin.bj.swiyu.didtoolbox.TdwCreator
 import ch.admin.eid.didresolver.Did
 import ch.admin.eid.didresolver.DidResolveException
-import ch.admin.eid.didtoolbox.DidDoc
-import ch.admin.eid.didtoolbox.Ed25519KeyPair
 import ch.admin.eid.didtoolbox.TrustDidWeb
 import ch.admin.eid.didtoolbox.TrustDidWebException
 import com.google.gson.GsonBuilder
@@ -39,9 +37,10 @@ fun main() {
     var didTdw = setupMockServer(verificationMethodKeyProvider)
 
     // Resolve did to did doc
-    var did: Did = Did(didTdw)
+    var did: Did = null
     var didLog = ""
     try {
+        did = Did(didTdw) // may throw DidResolveException
         // make a HTTP GET request to get the did log
         val url = did.getUrl() // may throw DidResolveException
         didLog = fetchDidLogContent(url)
@@ -53,7 +52,7 @@ fun main() {
     } finally {
         did.close()
     }
-    val didTdwRead = TrustDidWeb.read(didTdw, didLog, true)
+    val didTdwRead = TrustDidWeb.read(didTdw, didLog)
     val didDocStr = didTdwRead.getDidDoc()
 
     // Add assertion key for credential issuing

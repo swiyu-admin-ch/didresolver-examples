@@ -8,7 +8,7 @@ This project contains examples for different approaches to resolve a [`TDW`](htt
 ## Project integration
 
 Accommodate the `pom.xml` file to be able to import the required dependencies.
-For current/latest versions of the required dependencies, just rely on the relevant [`didresolver` GitHub packages](https://github.com/e-id-admin/didresolver-kotlin/packages/2242843) (as well as [`didtoolbox` GitHub packages](https://github.com/e-id-admin/didtoolbox-java/packages/2374074), used here though only for testing purposes only)
+For current/latest versions of the required dependencies, just rely on the relevant [`didresolver` GitHub packages](https://github.com/swiyu-admin-ch/didresolver-kotlin/packages/2414675) (as well as [`didtoolbox` GitHub packages](https://github.com/swiyu-admin-ch/didtoolbox-java/packages/2420331), used here though only for testing purposes only)
 ```xml
 <!-- file: pom.xml -->
 <dependencies>
@@ -36,7 +36,7 @@ For current/latest versions of the required dependencies, just rely on the relev
     <dependency>
         <groupId>ch.admin.bj.swiyu</groupId>
         <artifactId>didtoolbox</artifactId>
-        <version>1.0.0</version>
+        <version>{latest version as seen in repository}</version>
     </dependency>
 
     <!-- Other dependencies go here -->

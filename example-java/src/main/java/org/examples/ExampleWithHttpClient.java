@@ -1,34 +1,32 @@
 package org.examples;
 
-import ch.admin.eid.didtoolbox.DidDoc;
+import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl;
+import ch.admin.bj.swiyu.didtoolbox.TdwCreator;
+import ch.admin.bj.swiyu.didtoolbox.VerificationMethodKeyProvider;
+import ch.admin.eid.didresolver.Did;
+import ch.admin.eid.didresolver.DidResolveException;
 import ch.admin.eid.didtoolbox.TrustDidWeb;
 import ch.admin.eid.didtoolbox.TrustDidWebException;
-
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.RequestDefinition;
 
-import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl;
-import ch.admin.bj.swiyu.didtoolbox.TdwCreator;
-import ch.admin.bj.swiyu.didtoolbox.VerificationMethodKeyProvider;
-import ch.admin.eid.didresolver.*;
 import java.io.IOException;
-import java.net.http.HttpRequest;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 
 public class ExampleWithHttpClient {
 
-    private static ClientAndServer mockServer = org.mockserver.integration.ClientAndServer.startClientAndServer(8080);
+    private static ClientAndServer mockServer = ClientAndServer.startClientAndServer(8080);
 
     public static void main(String[] args) throws IOException, InterruptedException, TrustDidWebException, URISyntaxException {
 
@@ -44,18 +42,21 @@ public class ExampleWithHttpClient {
         var didTdw = setupMockServer(verificationMethodKeyProvider);
 
         // Resolve did to did doc
-        var did = new Did(didTdw);
+        Did did = null;
         String didLog = "";
         try {
+                did = new Did(didTdw); // may throw DidResolveException
                 // make a HTTP GET request to get the did log
                 var url = did.getUrl(); // may throw DidResolveException
                 didLog = fetchDidLogUsingHttpClient(url);
         } catch (URISyntaxException|DidResolveException e) {
                 throw new RuntimeException(e);
         } finally {
+            if (did != null) {
                 did.close();
+            }
         }
-        var didTdwRead = TrustDidWeb.Companion.read(didTdw, didLog, true);
+        var didTdwRead = TrustDidWeb.Companion.read(didTdw, didLog);
         String didDocStr = didTdwRead.getDidDoc();
         System.out.println(didDocStr);
 
@@ -113,7 +114,7 @@ public class ExampleWithHttpClient {
 
         var port = mockServer.getPort();
         mockServer.stop();
-        mockServer = org.mockserver.integration.ClientAndServer.startClientAndServer(port);
+        mockServer = ClientAndServer.startClientAndServer(port);
 
         var prettyJsonBody = (new GsonBuilder().setPrettyPrinting().create()).toJson(body);
 
