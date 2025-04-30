@@ -2,7 +2,6 @@ package org.examples;
 
 import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl;
 import ch.admin.bj.swiyu.didtoolbox.TdwCreator;
-import ch.admin.bj.swiyu.didtoolbox.VerificationMethodKeyProvider;
 import ch.admin.eid.didresolver.Did;
 import ch.admin.eid.didresolver.DidResolveException;
 import ch.admin.eid.didtoolbox.TrustDidWeb;
@@ -15,48 +14,94 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.RequestDefinition;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse.BodyHandlers;
+import java.security.KeyException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.net.ssl.*;
 
 public class ExampleWithHttpClient {
 
     private static ClientAndServer mockServer = ClientAndServer.startClientAndServer(8080);
 
-    public static void main(String[] args) throws IOException, InterruptedException, TrustDidWebException, URISyntaxException {
+    /**
+     * Configures SSL to trust all certificates and bypass hostname verification.
+     * This allows the application to connect to servers with untrusted or self-signed certificates.
+     * WARNING: This approach is insecure for production use.
+     */
+    static {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
 
-        // Retrieve key for did doc manipulations
-        //final var eddsaKeyPair = Ed25519KeyPair.Companion.generate();
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                        // Do nothing - trust all clients
+                    }
 
-        //var verificationMethodKeyProvider = Ed25519VerificationMethodKeyProviderImpl(File("private-key.pem"), File("public-key.pem"));
-        var verificationMethodKeyProvider = new Ed25519VerificationMethodKeyProviderImpl(
-                "z6Mkw9HFnueQzPrbcD5DzSsPswzKL1Ut4ExYwcbivPwcFPzf",
-                "z6MkvdAjfVZ2CWa38V2VgZvZVjSkENZpiuiV5gyRKsXDA8UP");
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                        // Do nothing - trust all servers
+                    }
+                }
+        };
 
-        // REPLACE this line with the custom logic how the did tdw log is published
-        var didTdw = setupMockServer(verificationMethodKeyProvider);
+        SSLContext sc = null;
+        try {
+            sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            throw new RuntimeException(e);
+        }
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+    }
+
+    public static void main(String[] args) {
+
+        String didTdw = null;
+        try {
+            didTdw = setupMockServer();
+        } catch (InvalidKeySpecException | IOException | TrustDidWebException | URISyntaxException | KeyStoreException |
+                 CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
 
         // Resolve did to did doc
         Did did = null;
         String didLog = "";
+        TrustDidWeb didTdwRead = null;
         try {
-                did = new Did(didTdw); // may throw DidResolveException
-                // make a HTTP GET request to get the did log
-                var url = did.getUrl(); // may throw DidResolveException
-                didLog = fetchDidLogUsingHttpClient(url);
-        } catch (URISyntaxException|DidResolveException e) {
-                throw new RuntimeException(e);
+            did = new Did(didTdw); // may throw DidResolveException
+            // make a HTTP GET request to get the did log
+            var url = did.getUrl(); // may throw DidResolveException
+            didLog = fetchDidLog(url); // may throw IOException, URISyntaxException
+            didTdwRead = TrustDidWeb.Companion.read(didTdw, didLog); // may throw TrustDidWebException
+        } catch (DidResolveException | IOException | URISyntaxException | TrustDidWebException e) {
+            throw new RuntimeException(e);
         } finally {
             if (did != null) {
                 did.close();
             }
         }
-        var didTdwRead = TrustDidWeb.Companion.read(didTdw, didLog);
         String didDocStr = didTdwRead.getDidDoc();
         System.out.println(didDocStr);
 
@@ -90,21 +135,26 @@ public class ExampleWithHttpClient {
     /**
      * Yet another handy private helper intended for testing purposes only.
      */
-    private static String setupMockServer(VerificationMethodKeyProvider verificationMethodKeyProvider) throws TrustDidWebException, MalformedURLException, IOException, URISyntaxException {
+    private static String setupMockServer() throws TrustDidWebException, MalformedURLException, IOException, URISyntaxException, InvalidKeySpecException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyException {
 
         // Create did with did doc
         String issuerId = "someIssuerIdNotReallyRelevantInThisContext";
 
         var didLog = TdwCreator.builder()
-                .verificationMethodKeyProvider(verificationMethodKeyProvider)
+                /*.verificationMethodKeyProvider(new Ed25519VerificationMethodKeyProviderImpl(
+                        new File("src/test/data/id_ed25519"),
+                        new File("src/test/data/id_ed25519.pub")))*/
+                .verificationMethodKeyProvider(new Ed25519VerificationMethodKeyProviderImpl(
+                        new FileInputStream("src/test/data/mykeystore.jks"), "changeit", "myalias", "changeit"))
+                .forceOverwrite(true) // to avoid The PEM file(s) exist(s) already and will remain intact until overwrite mode is engaged: .didtoolbox/auth-key-01
                 .build()
                 .create(URL.of(new URI(String.format("http://localhost:%d/%s", mockServer.getLocalPort(), issuerId)), null));
 
         mockServer.when(new RequestDefinition() {
-                @Override
-                public RequestDefinition shallowClone() {
-                        return null;
-                }
+            @Override
+            public RequestDefinition shallowClone() {
+                return null;
+            }
         }).respond(new HttpResponse().withBody(didLog));
 
         return JsonParser.parseString(didLog).getAsJsonArray().get(3).getAsJsonObject().get("value").getAsJsonObject().get("id").getAsString();
@@ -119,25 +169,26 @@ public class ExampleWithHttpClient {
         var prettyJsonBody = (new GsonBuilder().setPrettyPrinting().create()).toJson(body);
 
         mockServer.when(new RequestDefinition() {
-                @Override
-                public RequestDefinition shallowClone() {
-                        return null;
-                }
+            @Override
+            public RequestDefinition shallowClone() {
+                return null;
+            }
         }).respond(new HttpResponse().withBody(prettyJsonBody));
     }
 
-    private static String fetchDidLogUsingHttpClient(String url) throws IOException, InterruptedException, URISyntaxException {
+    private static String fetchDidLog(String url) throws IOException, URISyntaxException {
 
-        var request = HttpRequest.newBuilder()
-                .uri(new URI(url))
-                .GET()
-                .build();
+        StringBuilder content = new StringBuilder();
 
-        var response = HttpClient
-                .newBuilder()
-                .build()
-                .send(request, BodyHandlers.ofString());
+        // Open HTTPS connection and read content
+        HttpsURLConnection connection = (HttpsURLConnection) (new URI(url)).toURL().openConnection();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+        }
 
-        return response.body();
+        return content.toString();
     }
 }
