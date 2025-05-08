@@ -3,7 +3,7 @@
 ## Resolve a [`TDW`](https://identity.foundation/didwebvh/v0.3) DID document
 
 This project contains examples for different approaches to resolve a [`TDW`](https://identity.foundation/didwebvh/v0.3) DID document:
-- [User provided HTTP client](/src/main/java/org/examples/ExampleWithHttpClient.java) -> uses an HTTP client to fetch a DID log and then resolves it using the library
+- [User provided HTTP client](/example-java/src/main/java/org/examples/ExampleWithHttpClient.java) -> uses an HTTP client to fetch a DID log and then resolves it using the library
 
 ## Project integration
 
