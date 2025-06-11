@@ -8,15 +8,18 @@ This project contains examples for different approaches to resolve a [`TDW`](htt
 ## Project integration
 
 Accommodate the `pom.xml` file to be able to import the required dependencies.
-For current/latest versions of the required dependencies, just rely on the relevant [`didresolver` GitHub packages](https://github.com/swiyu-admin-ch/didresolver-kotlin/packages/2414675) (as well as [`didtoolbox` GitHub packages](https://github.com/swiyu-admin-ch/didtoolbox-java/packages/2420331), used here though only for testing purposes only)
+For current/latest versions of the required dependencies, just rely on the relevant 
+[`didresolver` Maven Central Repository packages](https://repo1.maven.org/maven2/io/github/swiyu-admin-ch/didresolver) 
+(as well as [`didtoolbox` Maven Central Repository packages](https://repo1.maven.org/maven2/io/github/swiyu-admin-ch/didtoolbox), 
+used here though only for testing purposes only)
 ```xml
 <!-- file: pom.xml -->
 <dependencies>
 
     <dependency>
-        <groupId>ch.admin.eid</groupId>
+        <groupId>io.github.swiyu-admin-ch</groupId>
         <artifactId>didresolver</artifactId>
-        <version>{latest version as seen in repository}</version>
+        <!--version>[ANY_AVAILABLE_VERSION]</version-->
     </dependency>
 
     <!-- MANDATORY (required by didresolver) -->
@@ -34,9 +37,9 @@ For current/latest versions of the required dependencies, just rely on the relev
     </dependency>
     <!-- optional, used here for testing purposes only -->
     <dependency>
-        <groupId>ch.admin.bj.swiyu</groupId>
+        <groupId>io.github.swiyu-admin-ch</groupId>
         <artifactId>didtoolbox</artifactId>
-        <version>{latest version as seen in repository}</version>
+        <!--version>[ANY_AVAILABLE_VERSION]</version-->
     </dependency>
 
     <!-- Other dependencies go here -->

@@ -138,7 +138,7 @@ public class ExampleWithHttpClient {
     private static String setupMockServer() throws TrustDidWebException, MalformedURLException, IOException, URISyntaxException, InvalidKeySpecException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyException {
 
         // Create did with did doc
-        String issuerId = "someIssuerIdNotReallyRelevantInThisContext";
+        String issuerId = "did18fa7c77-9dd1-4e20-a147-fb1bec146085";
 
         var didLog = TdwCreator.builder()
                 /*.verificationMethodKeyProvider(new Ed25519VerificationMethodKeyProviderImpl(
