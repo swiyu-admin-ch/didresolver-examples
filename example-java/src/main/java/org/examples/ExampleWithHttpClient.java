@@ -2,6 +2,7 @@ package org.examples;
 
 import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl;
 import ch.admin.bj.swiyu.didtoolbox.TdwCreator;
+import ch.admin.bj.swiyu.didtoolbox.TdwUpdaterException;
 import ch.admin.eid.didresolver.Did;
 import ch.admin.eid.didresolver.DidResolveException;
 import ch.admin.eid.didtoolbox.TrustDidWeb;
@@ -14,24 +15,21 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.RequestDefinition;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.KeyException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
-
-import javax.net.ssl.*;
 
 public class ExampleWithHttpClient {
 
@@ -80,7 +78,8 @@ public class ExampleWithHttpClient {
         try {
             didTdw = setupMockServer();
         } catch (InvalidKeySpecException | IOException | TrustDidWebException | URISyntaxException | KeyStoreException |
-                 CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyException e) {
+                 CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyException |
+                 TdwUpdaterException e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -135,7 +134,8 @@ public class ExampleWithHttpClient {
     /**
      * Yet another handy private helper intended for testing purposes only.
      */
-    private static String setupMockServer() throws TrustDidWebException, MalformedURLException, IOException, URISyntaxException, InvalidKeySpecException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyException {
+    private static String setupMockServer() throws TrustDidWebException, IOException, URISyntaxException, InvalidKeySpecException,
+            KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyException, TdwUpdaterException {
 
         // Create did with did doc
         String issuerId = "did18fa7c77-9dd1-4e20-a147-fb1bec146085";
@@ -150,6 +150,19 @@ public class ExampleWithHttpClient {
                 .build()
                 .create(URL.of(new URI(String.format("http://localhost:%d/%s", mockServer.getLocalPort(), issuerId)), null));
 
+        /*
+        var updatedDidLog = new StringBuilder(didLog)
+                .append(System.lineSeparator())
+                .append(TdwUpdater.builder()
+                        .verificationMethodKeyProvider(new Ed25519VerificationMethodKeyProviderImpl(
+                                new FileInputStream("src/test/data/mykeystore.jks"), "changeit", "myalias", "changeit"))
+                        .assertionMethodKeys(Map.of("my-assert-key-01", JwkUtils.loadECPublicJWKasJSON(new File("src/test/data/assert-key-01.pub"), "my-assert-key-01")))
+                        .authenticationKeys(Map.of("my-auth-key-01", JwkUtils.loadECPublicJWKasJSON(new File("src/test/data/auth-key-01.pub"), "my-auth-key-01")))
+                        //.updateKeys(Set.of(new File("src/test/data/public.pem")))
+                        .build()
+                        .update(initialDidLogEntry)).toString();
+         */
+
         mockServer.when(new RequestDefinition() {
             @Override
             public RequestDefinition shallowClone() {
@@ -157,7 +170,7 @@ public class ExampleWithHttpClient {
             }
         }).respond(new HttpResponse().withBody(didLog));
 
-        return JsonParser.parseString(didLog).getAsJsonArray().get(3).getAsJsonObject().get("value").getAsJsonObject().get("id").getAsString();
+        return JsonParser.parseString(didLog.lines().toList().getFirst()).getAsJsonArray().get(3).getAsJsonObject().get("value").getAsJsonObject().get("id").getAsString();
     }
 
     private static void restartMockServer(String body) {
