@@ -26,7 +26,7 @@ used here though only for testing purposes only)
     <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.14.0</version>
+        <version>5.17.0</version>
     </dependency>
 
     <!-- optional, for JSON manipulation -->

@@ -13,10 +13,6 @@ Accommodate the `build.gradle.kts` file to be able to import the required depend
 repositories {
     mavenCentral()
     maven {
-        name = "DidResolverGitHubPackages"
-        url = uri("https://maven.pkg.github.com/e-id-admin/didresolver-kotlin")
-    }
-    maven {
         // CAUTION The maven repo of https://github.com/multiformats/java-multibase
         //         required (as dep) by ch.admin.bj.swiyu:didtoolbox:1.*.*
         name = "jitpack.io"
@@ -25,12 +21,12 @@ repositories {
 }
 ```
 
-For current/latest versions of the required dependencies, just rely on the relevant [`didresolver` GitHub packages](https://github.com/swiyu-admin-ch/didresolver-kotlin/packages/2414675)
+For current/latest versions of the required dependencies, just rely on the relevant [`didresolver` Maven Central Repository packages](https://repo1.maven.org/maven2/io/github/swiyu-admin-ch/didresolver)
 ```kotlin
 // file: build.gradle.kts
 dependencies {
     // Other dependencies go here
-    implementation("ch.admin.eid:didresolver:{latest version as seen in repository}")
+    implementation("io.github.swiyu-admin-ch:didresolver:{latest version as seen in repository}")
 }
 ```
 
