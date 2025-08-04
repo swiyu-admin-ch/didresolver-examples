@@ -48,7 +48,7 @@ object ExampleWithHttpClient {
             }
         )
 
-        var sc: SSLContext? = null
+        var sc: SSLContext
         try {
             sc = SSLContext.getInstance("SSL")
             sc.init(null, trustAllCerts, SecureRandom())
@@ -72,13 +72,12 @@ object ExampleWithHttpClient {
 
         // Resolve did to did doc
         var did: Did? = null
-        var didLog = ""
         var didTdwRead: TrustDidWeb? = null
         try {
             did = Did(didTdw) // may throw DidResolveException
             // make a HTTP GET request to get the did log
             val url = did.getUrl() // may throw DidResolveException
-            didLog = fetchDidLog(url)
+            val didLog = fetchDidLog(url)
             didTdwRead = TrustDidWeb.read(didTdw, didLog)
         } catch (e: Exception) {
             when (e::class) {
