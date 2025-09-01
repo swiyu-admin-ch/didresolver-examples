@@ -1,5 +1,10 @@
 import SwiftUI
 
+#if canImport(didFFI)
+import didFFI
+#endif
+
+
 // MARK: - ContentView
 
 struct ContentView: View {
@@ -25,19 +30,15 @@ extension ContentView {
 
   func tryDidResolver() {
 
-      // CAUTION didTdw MUST match the one residing in the TestDidLog resource
-      let _ = Server(port: 54858)
-
       RunLoop.main.perform(
         {
-            // CAUTION didTdw MUST match the one residing in the TestDidLog resource
-            let didTdw = "did:tdw:QmUSyQohHF4tcRhdkJYoamuMQAXQmYBoFLCot35xd7dPda:127.0.0.1%3A54858:123456789"
-            //let did = try? Did(didTdw: didTdw); // may throw DidResolveError
-            let did = try? Did(didTdw: didTdw); // may throw DidResolveError
+            //let did = "did:tdw:QmRjT8JCbQkEffVBWSbQd8nbMVNfAxiXStLPmqkQUWcsfv:gist.githubusercontent.com:vst-bit:32b64cfac9075b2a3ab7301b772bcdef:raw:8b4bd2b715101d5b69b3395f5c560c37e1ae9992"
+            let did = "did:webvh:QmXi8p2LNXA6kbc2brwdpXwGETHCrPoFk15yPbLaAu27Pj:gist.githubusercontent.com:vst-bit:20c3f59d8179e324a6e29aef45240db4:raw:7870280f80dfcfb7459ee1488df4ab33f2bcf709"
+            let didObj = try? Did(did: did); // may throw DidResolveError
 
             // make a HTTP GET request to get the did log
-            let url = try? did?.getUrl(); // may throw DidResolveError
-
+            let url = try? didObj?.getUrl(); // may throw DidResolveError
+            
             var didLog = ""
             let task = URLSession.shared.dataTask(with: URL(string: url!)!) {(data, response, error) in
                 guard let data = data else { return }
@@ -55,12 +56,14 @@ extension ContentView {
                 }
                  */
 
-                guard let didDoc = try? did?.resolve(didTdwLog: didLog) else { // may throw DidResolveError
+                // The `resolve` method is @deprecated as of 2.2.0 replaced by more potent `resolve_all`
+                guard let didDocExtended = try? didObj?.resolveAll(didLog: didLog) else { // may throw DidResolveError
                     self.message = "NOK"
                     fatalError("Resolution failed")
                 }
-                //let verifMethod = didDoc.getVerificationMethod();
-                let didDocId = didDoc.getId();
+                self.message = "NOK"
+                //let verifMethod = didDocExtended.getDidDoc().getVerificationMethod();
+                let didDocId = didDocExtended.getDidDoc().getId();
 
                 //self.message = didDocId
                 self.message = "DID OK -> " + didDocId
