@@ -1,15 +1,12 @@
 import SwiftUI
 
-#if canImport(didFFI)
-import didFFI
-#endif
-
+import Swifter
 
 // MARK: - ContentView
 
 struct ContentView: View {
 
-  @State private var message = "Hello, world!"
+  @State private var message = ""
 
   var body: some View {
       let _ = Self._printChanges()
@@ -21,7 +18,24 @@ struct ContentView: View {
     }
     .padding()
     .onAppear {
+        
+        let server = HttpServer()
+        // CAUTION The path MUST match the one residing in the TdwDidLog.jsonl resource
+        server["/123456789/:path"] = shareFile(Bundle.main.resourcePath! + "/TdwDidLog.jsonl")
+        let serverTask = Task {
+            do {
+                // CAUTION The port MUST match the one residing in the TdwDidLog.jsonl resource
+                try server.start(54858, forceIPv4: true)
+                print("Server has started. Try visiting http://localhost:\(try server.port())\(server.routes[0])/did.jsonl")
+            } catch {
+                print("Server start error: \(error)")
+            }
+        }
+        
         tryDidResolver()
+        
+        server.stop()
+        serverTask.cancel()
     }
   }
 }
@@ -30,48 +44,47 @@ extension ContentView {
 
   func tryDidResolver() {
 
-      RunLoop.main.perform(
-        {
-            //let did = "did:tdw:QmRjT8JCbQkEffVBWSbQd8nbMVNfAxiXStLPmqkQUWcsfv:gist.githubusercontent.com:vst-bit:32b64cfac9075b2a3ab7301b772bcdef:raw:8b4bd2b715101d5b69b3395f5c560c37e1ae9992"
-            let did = "did:webvh:QmXi8p2LNXA6kbc2brwdpXwGETHCrPoFk15yPbLaAu27Pj:gist.githubusercontent.com:vst-bit:20c3f59d8179e324a6e29aef45240db4:raw:7870280f80dfcfb7459ee1488df4ab33f2bcf709"
-            let didObj = try? Did(did: did); // may throw DidResolveError
+    // CAUTION didTdw MUST match the one residing in the TdwDidLog.jsonl resource
+    let didTdw = "did:tdw:QmUSyQohHF4tcRhdkJYoamuMQAXQmYBoFLCot35xd7dPda:127.0.0.1%3A54858:123456789"
+    let did = try? Did(did: didTdw); // may throw DidResolveError
 
-            // make a HTTP GET request to get the did log
-            let url = try? didObj?.getUrl(); // may throw DidResolveError
-            
-            var didLog = ""
-            let task = URLSession.shared.dataTask(with: URL(string: url!)!) {(data, response, error) in
-                guard let data = data else { return }
+    // make a HTTP GET request to get the did log
+    let httpsUrl = try? did?.getUrl(); // may throw DidResolveError
+    print("DID URL: " + httpsUrl!)
+    let url = httpsUrl?.replacingOccurrences(of: "https", with: "http") // since our HttpServer is HTTP-only
 
-                didLog = String(data: data, encoding: .utf8)!
-
-                /*
-                if let jsonData = didLog.data(using: String.Encoding.utf8) {
-                    do {
-                        _ = try JSONSerialization.jsonObject(with: jsonData)
-                            //print("JSON OK: \(x.self)")
-                        } catch {
-                            fatalError("Invalid JSON: \(error.localizedDescription)")
-                    }
-                }
-                 */
-
-                // The `resolve` method is @deprecated as of 2.2.0 replaced by more potent `resolve_all`
-                guard let didDocExtended = try? didObj?.resolveAll(didLog: didLog) else { // may throw DidResolveError
-                    self.message = "NOK"
-                    fatalError("Resolution failed")
-                }
-                self.message = "NOK"
-                //let verifMethod = didDocExtended.getDidDoc().getVerificationMethod();
-                let didDocId = didDocExtended.getDidDoc().getId();
-
-                //self.message = didDocId
-                self.message = "DID OK -> " + didDocId
-            }
-            task.resume()
+    var didLog = ""
+    let task = URLSession.shared.dataTask(with: URL(string: url!)!) {(data, response, error) in
+        guard let data = data else {
+            self.message = "\n❌ DID unavailable due to: \n\n" + error!.localizedDescription
+            return
         }
-      )
 
-      RunLoop.main.run(until: Date().addingTimeInterval(5)) // wait up a bit...
+        didLog = String(data: data, encoding: .utf8)!
+
+        /*
+        if let jsonData = didLog.data(using: String.Encoding.utf8) {
+            do {
+                _ = try JSONSerialization.jsonObject(with: jsonData)
+                    //print("JSON OK: \(x.self)")
+                } catch {
+                    fatalError("Invalid JSON: \(error.localizedDescription)")
+            }
+        }
+         */
+
+        guard let didDocExtended = try? did?.resolveAll(didLog: didLog) else { // may throw DidResolveError
+            self.message = "\n❌ DID NOK"
+            fatalError("Resolution failed")
+        }
+        
+        let didDoc = didDocExtended.getDidDoc();
+        let didDocId = didDoc.getId();
+        print("DID Doc ID: " + didDocId)
+
+        self.message = "\n✅ DID OK (\(Date.now.ISO8601Format())) -> \n\n" + didDocId
+    }
+
+    task.resume()
   }
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct BbsCryptosuiteDemoAppApp: App {
+struct DidResolverDemoApp: App {
   var body: some Scene {
     WindowGroup {
       ContentView()
