@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4648ED352E70A4CE00448B54 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		468079732E73604200512F53 /* DidResolver in Frameworks */ = {isa = PBXBuildFile; productRef = 468079722E73604200512F53 /* DidResolver */; };
 		46A632432E6DB687000CD0BD /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 46A632422E6DB687000CD0BD /* Swifter */; };
 		46A6324C2E6DBC62000CD0BD /* DidResolverDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A6324B2E6DBC62000CD0BD /* DidResolverDemoApp.swift */; };
-		46B7254C2CCFBC4B00B511A7 /* didresolver.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46B7254B2CCFBC4B00B511A7 /* didresolver.xcframework */; };
-		46B7254D2CCFBC6500B511A7 /* didresolver.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46B7254B2CCFBC4B00B511A7 /* didresolver.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		46FA5F702E70BD1B00770874 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		46FA5F752E70C42800770874 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		539475D72BE123BE001A8B09 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539475D62BE123BE001A8B09 /* ContentView.swift */; };
 		539475D92BE123BF001A8B09 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 539475D82BE123BF001A8B09 /* Assets.xcassets */; };
 		539475DC2BE123BF001A8B09 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 539475DB2BE123BF001A8B09 /* Preview Assets.xcassets */; };
@@ -23,7 +25,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				46B7254D2CCFBC6500B511A7 /* didresolver.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -32,7 +33,6 @@
 
 /* Begin PBXFileReference section */
 		46A6324B2E6DBC62000CD0BD /* DidResolverDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DidResolverDemoApp.swift; sourceTree = "<group>"; };
-		46B7254B2CCFBC4B00B511A7 /* didresolver.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = didresolver.xcframework; path = DidResolverDemoApp/Vendors/didresolver.xcframework; sourceTree = "<group>"; };
 		539475D12BE123BE001A8B09 /* DidResolverDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DidResolverDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		539475D62BE123BE001A8B09 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		539475D82BE123BF001A8B09 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -40,7 +40,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		461DB75C2E65BAB6007AC84B /* Sources */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Sources; sourceTree = "<group>"; };
 		46A632442E6DB6AD000CD0BD /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -49,8 +48,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				46B7254C2CCFBC4B00B511A7 /* didresolver.xcframework in Frameworks */,
 				46A632432E6DB687000CD0BD /* Swifter in Frameworks */,
+				46FA5F702E70BD1B00770874 /* (null) in Frameworks */,
+				46FA5F752E70C42800770874 /* (null) in Frameworks */,
+				468079732E73604200512F53 /* DidResolver in Frameworks */,
+				4648ED352E70A4CE00448B54 /* (null) in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +64,6 @@
 			children = (
 				539475D32BE123BE001A8B09 /* DidResolverDemoApp */,
 				539475D22BE123BE001A8B09 /* Products */,
-				539475E42BE12415001A8B09 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -82,7 +83,6 @@
 				539475D62BE123BE001A8B09 /* ContentView.swift */,
 				539475D82BE123BF001A8B09 /* Assets.xcassets */,
 				539475DA2BE123BF001A8B09 /* Preview Content */,
-				461DB75C2E65BAB6007AC84B /* Sources */,
 			);
 			path = DidResolverDemoApp;
 			sourceTree = "<group>";
@@ -93,14 +93,6 @@
 				539475DB2BE123BF001A8B09 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		539475E42BE12415001A8B09 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				46B7254B2CCFBC4B00B511A7 /* didresolver.xcframework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -120,7 +112,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				461DB75C2E65BAB6007AC84B /* Sources */,
 				46A632442E6DB6AD000CD0BD /* Resources */,
 			);
 			name = DidResolverDemoApp;
@@ -154,6 +145,7 @@
 			mainGroup = 539475C82BE123BE001A8B09;
 			packageReferences = (
 				46A632412E6DB687000CD0BD /* XCRemoteSwiftPackageReference "swifter" */,
+				468079712E73604200512F53 /* XCRemoteSwiftPackageReference "didresolver-swift" */,
 			);
 			productRefGroup = 539475D22BE123BE001A8B09 /* Products */;
 			projectDirPath = "";
@@ -390,6 +382,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		468079712E73604200512F53 /* XCRemoteSwiftPackageReference "didresolver-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swiyu-admin-ch/didresolver-swift/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
 		46A632412E6DB687000CD0BD /* XCRemoteSwiftPackageReference "swifter" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/httpswift/swifter.git";
@@ -401,6 +401,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		468079722E73604200512F53 /* DidResolver */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 468079712E73604200512F53 /* XCRemoteSwiftPackageReference "didresolver-swift" */;
+			productName = DidResolver;
+		};
 		46A632422E6DB687000CD0BD /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 46A632412E6DB687000CD0BD /* XCRemoteSwiftPackageReference "swifter" */;

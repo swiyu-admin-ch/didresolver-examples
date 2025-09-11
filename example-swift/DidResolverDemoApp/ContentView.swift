@@ -2,6 +2,8 @@ import SwiftUI
 
 import Swifter
 
+import DidResolver
+
 // MARK: - ContentView
 
 struct ContentView: View {
