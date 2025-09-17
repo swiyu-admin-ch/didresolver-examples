@@ -1,13 +1,9 @@
 import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl
-import ch.admin.bj.swiyu.didtoolbox.TdwCreator
+import ch.admin.bj.swiyu.didtoolbox.context.DidLogCreatorContext
 import ch.admin.eid.didresolver.Did
 import ch.admin.eid.didresolver.DidResolveException
-import ch.admin.eid.didtoolbox.TrustDidWeb
-import ch.admin.eid.didtoolbox.TrustDidWebException
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.gson.JsonPrimitive
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.RequestDefinition
 import java.io.FileInputStream
@@ -64,69 +60,48 @@ object ExampleWithHttpClient {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        // Retrieve key for did doc manipulations
-        //val eddsaKeyPair = Ed25519KeyPair.generate()
-
         // REPLACE this line with the custom logic how the did tdw log is published
         var didTdw = setupMockServer()
 
         // Resolve did to did doc
         var did: Did? = null
-        var didTdwRead: TrustDidWeb? = null
         try {
             did = Did(didTdw) // may throw DidResolveException
             // make a HTTP GET request to get the did log
-            val url = did.getUrl() // may throw DidResolveException
+            val url = did.getHttpsUrl() // may throw DidResolveException
             val didLog = fetchDidLog(url)
-            didTdwRead = TrustDidWeb.read(didTdw, didLog)
+
+            val didDoc = did.resolveAll(didLog).getDidDoc()
+
+            println(didDoc.getVerificationMethod())
+
         } catch (e: Exception) {
             when (e::class) {
                 is URISyntaxException -> throw RuntimeException(e)
                 is DidResolveException -> throw RuntimeException(e)
-                is TrustDidWebException -> throw RuntimeException(e)
             }
         } finally {
             did?.close()
         }
-        val didDocStr = didTdwRead?.getDidDoc()
-
-        // Add assertion key for credential issuing
-        val didDoc = JsonParser.parseString(didDocStr.toString()).asJsonObject
-        val assertionMethod = JsonObject()
-        assertionMethod.add("id", JsonPrimitive("$didTdw#issuing"))
-        assertionMethod.add("controller", JsonPrimitive(didTdw))
-        assertionMethod.add("type", JsonPrimitive("Bls12381G2Key2020"))
-        // TODO assertionMethod.add("publicKeyMultibase", JsonPrimitive(bbsKeyPair.getPublicKey().toMultibase()))
-        val verificationMethod = didDoc.get("verificationMethod").asJsonArray
-        verificationMethod.add(assertionMethod)
-        didDoc.add("verificationMethod", verificationMethod)
-
-        println(didDocStr)
 
         /*
-        // TODO Update DidDoc
-        var didTdwUpdate = TrustDidWeb.update(didTdw, didLog, didDoc.toString(), eddsaKeyPair, null);
-
-        // REPLACE this line with the custom logic how the did tdw log is update
-        //var didTdwUpdateDidLog = didTdwUpdate.getDidLog();
-
+        // TODO Update the DidDoc and re-setup the server
         restartMockServer(didTdwUpdateDidLog);
 
         // Get modified did doc
-        val modifiedDidDocStr = TrustDidWeb.read(didTdw, didTdwUpdateDidLog, null)
-        println(modifiedDidDocStr)
+        val didDocUpdated = did.resolve(didLog)
+        println(didDocUpdated.getVerificationMethod())
          */
 
         exitProcess(0)
     }
 
-    @Throws(TrustDidWebException::class)
     private fun setupMockServer(): String {
         // Create did with did doc
 
         val issuerId = "did18fa7c77-9dd1-4e20-a147-fb1bec146085"
 
-        val tdwDidLog = TdwCreator.builder()
+        val tdwDidLog = DidLogCreatorContext.builder()
             .verificationMethodKeyProvider(
                 Ed25519VerificationMethodKeyProviderImpl(
                     FileInputStream("src/test/data/mykeystore.jks"),
@@ -154,7 +129,7 @@ object ExampleWithHttpClient {
             }
         }).respond(HttpResponse().withBody(tdwDidLog))
 
-        return JsonParser.parseString(tdwDidLog).asJsonArray[3].asJsonObject["value"].asJsonObject["id"].asString
+        return JsonParser.parseString(tdwDidLog).asJsonObject["state"].asJsonObject["id"].asString
     }
 
     private fun restartMockServer(body: String) {
