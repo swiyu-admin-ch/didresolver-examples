@@ -1,5 +1,5 @@
 {
-  "originHash" : "1bb085a62eb71e869df8fb35eb44b046ae6d906482a6fed02022673f74061c9b",
+  "originHash" : "3f82bb5bd9069a5e24b42f6474f876716b8a948e24e12fded508a3856d6860cb",
   "pins" : [
     {
       "identity" : "didresolver-swift",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "53d9edc0955e079798bb3ba747e3ce6fb640778f",
         "version" : "2.2.0"
+      }
+    },
+    {
+      "identity" : "jsonschema-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiyu-admin-ch/jsonschema-swift",
+      "state" : {
+        "revision" : "9d588dfb0f44345b6bcc2c3fde59332979a4e119",
+        "version" : "0.33.0"
       }
     },
     {

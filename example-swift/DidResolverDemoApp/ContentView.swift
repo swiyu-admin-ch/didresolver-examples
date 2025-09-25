@@ -4,6 +4,8 @@ import Swifter
 
 import DidResolver
 
+import JsonSchemaValidator
+
 // MARK: - ContentView
 
 struct ContentView: View {
@@ -74,9 +76,18 @@ extension ContentView {
             }
         }
          */
+        
+        // CAUTION The validation here is for illustration purposes only - it is already part of the DID resolution process!
+        let tdwJsonSchemaURL = URL(string: "https://raw.githubusercontent.com/swiyu-admin-ch/did-tdw/main/src/embed/jsonschema/did_log_jsonschema_v_0_3_eid_conform.json");
+        //let webvhJsonSchemaURL = URL(string: "https://raw.githubusercontent.com/swiyu-admin-ch/did-webvh/main/src/embed/jsonschema/did_log_jsonschema_v_1_0_eid_conform.json");
+        let jsonSchemaFromURL = try? String(contentsOf: tdwJsonSchemaURL!);
+        let validator = try? Validator(schema: jsonSchemaFromURL!); // may throw ValidatorError::InvalidSchema
+        let isValid = try? validator?.isValid(instance: didLog); // may throw ValidatorError::DeserializationError
+        if !isValid! {
+            fatalError("The DID log is NOT JSON-schema-conform")
+        }
 
         guard let didDocExtended = try? did?.resolveAll(didLog: didLog) else { // may throw DidResolveError
-            self.message = "\n❌ DID NOK"
             fatalError("Resolution failed")
         }
         
