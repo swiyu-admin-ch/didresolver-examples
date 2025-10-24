@@ -18,7 +18,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.mock-server:mockserver-netty-no-dependencies:5.14.0")
-    implementation("io.github.swiyu-admin-ch:didresolver:2.2.0")
+    implementation("io.github.swiyu-admin-ch:didresolver:2.3.0")
     implementation("io.github.swiyu-admin-ch:didtoolbox:1.6.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation(kotlin("stdlib-jdk8"))
