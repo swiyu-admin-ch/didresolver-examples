@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiyu-admin-ch/jsonschema-swift",
       "state" : {
-        "revision" : "9d588dfb0f44345b6bcc2c3fde59332979a4e119",
-        "version" : "0.33.0"
+        "revision" : "4639bad8ac9197a436095e9b54efefdfea4a58e3",
+        "version" : "0.34.0"
       }
     },
     {
