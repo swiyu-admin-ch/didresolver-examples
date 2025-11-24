@@ -2,8 +2,12 @@ package org.examples;
 
 import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl;
 import ch.admin.bj.swiyu.didtoolbox.context.*;
+import ch.admin.eid.did_sidekicks.DidDoc;
+import ch.admin.eid.did_webvh.WebVerifiableHistory;
+import ch.admin.eid.did_webvh.WebVerifiableHistoryId;
 import ch.admin.eid.didresolver.Did;
 import ch.admin.eid.didresolver.DidResolveException;
+import ch.admin.eid.didtoolbox.TrustDidWeb;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import org.mockserver.integration.ClientAndServer;
@@ -69,9 +73,9 @@ public class ExampleWithHttpClient {
 
     public static void main(String[] args) {
 
-        String didTdw = null;
+        String did = null;
         try {
-            didTdw = setupMockServer();
+            did = setupMockServer();
         } catch (InvalidKeySpecException | IOException | URISyntaxException | KeyStoreException |
                  CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyException |
                  DidLogCreatorStrategyException e) {
@@ -80,23 +84,23 @@ public class ExampleWithHttpClient {
         }
 
         // Resolve did to did doc
-        Did did = null;
+        Did didObj = null;
         String didLog = "";
         try {
 
-            did = new Did(didTdw); // may throw DidResolveException
+            didObj = new Did(did); // may throw DidResolveException
             // make a HTTP GET request to get the did log
-            var url = did.getHttpsUrl(); // may throw DidResolveException
+            var url = didObj.getHttpsUrl(); // may throw DidResolveException
             didLog = fetchDidLog(url); // may throw IOException, URISyntaxException
-            var didDoc = did.resolveAll(didLog).getDidDoc();
+            var didDoc = didObj.resolveAll(didLog).getDidDoc();
 
             System.out.println(didDoc.getVerificationMethod());
 
         } catch (DidResolveException | IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         } finally {
-            if (did != null) {
-                did.close();
+            if (didObj != null) {
+                didObj.close();
             }
         }
 

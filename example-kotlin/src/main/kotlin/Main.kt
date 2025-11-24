@@ -61,17 +61,17 @@ object ExampleWithHttpClient {
     fun main(args: Array<String>) {
 
         // REPLACE this line with the custom logic how the did tdw log is published
-        var didTdw = setupMockServer()
+        var did = setupMockServer()
 
         // Resolve did to did doc
-        var did: Did? = null
+        var didObj: Did? = null
         try {
-            did = Did(didTdw) // may throw DidResolveException
+            didObj = Did(did) // may throw DidResolveException
             // make a HTTP GET request to get the did log
-            val url = did.getHttpsUrl() // may throw DidResolveException
+            val url = didObj.getHttpsUrl() // may throw DidResolveException
             val didLog = fetchDidLog(url)
 
-            val didDoc = did.resolveAll(didLog).getDidDoc()
+            val didDoc = didObj.resolveAll(didLog).getDidDoc()
 
             println(didDoc.getVerificationMethod())
 
@@ -81,7 +81,7 @@ object ExampleWithHttpClient {
                 is DidResolveException -> throw RuntimeException(e)
             }
         } finally {
-            did?.close()
+            didObj?.close()
         }
 
         /*
