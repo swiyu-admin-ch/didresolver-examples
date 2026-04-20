@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiyu-admin-ch/didresolver-swift/",
       "state" : {
-        "revision" : "369660fbe42b7db43180bdde37dfadadd7149cad",
-        "version" : "2.4.0"
+        "revision" : "0c2cd6f5cff27d90085af1b08b4cf2ad7fd6b62d",
+        "version" : "2.7.0"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiyu-admin-ch/jsonschema-swift",
       "state" : {
-        "revision" : "4639bad8ac9197a436095e9b54efefdfea4a58e3",
-        "version" : "0.34.0"
+        "revision" : "77eac7ef0382213a08976925f294b20a532c677e",
+        "version" : "0.45.0"
       }
     },
     {

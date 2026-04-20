@@ -1,5 +1,6 @@
 import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl
 import ch.admin.bj.swiyu.didtoolbox.context.DidLogCreatorContext
+import ch.admin.bj.swiyu.didtoolbox.model.VerificationMethod;
 import ch.admin.eid.didresolver.Did
 import ch.admin.eid.didresolver.DidResolveException
 import com.google.gson.GsonBuilder
@@ -11,6 +12,7 @@ import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
+import java.nio.file.Path
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.net.ssl.HttpsURLConnection
@@ -20,6 +22,9 @@ import javax.net.ssl.X509TrustManager
 import kotlin.system.exitProcess
 
 object ExampleWithHttpClient {
+
+    private const val TEST_DATA_PATH_PREFIX: String = "src/test/data/"
+
     private var mockServer = org.mockserver.integration.ClientAndServer.startClientAndServer(8080)
 
     /**
@@ -102,15 +107,30 @@ object ExampleWithHttpClient {
         val issuerId = "did18fa7c77-9dd1-4e20-a147-fb1bec146085"
 
         val tdwDidLog = DidLogCreatorContext.builder()
-            .verificationMethodKeyProvider(
+            .cryptographicSuite(
                 Ed25519VerificationMethodKeyProviderImpl(
-                    FileInputStream("src/test/data/mykeystore.jks"),
+                    FileInputStream(TEST_DATA_PATH_PREFIX + "mykeystore.jks"),
                     "changeit",
                     "myalias",
                     "changeit"
                 )
             )
-            .forceOverwrite(true)
+            .assertionMethods(
+                setOf(
+                    VerificationMethod.of(
+                        "my-assert-key-01",
+                        Path.of(TEST_DATA_PATH_PREFIX + "assert-key-01.pub")
+                    )
+                )
+            )
+            .authentications(
+                setOf(
+                    VerificationMethod.of(
+                        "my-auth-key-01",
+                        Path.of(TEST_DATA_PATH_PREFIX + "auth-key-01.pub")
+                    )
+                )
+            )
             .build()
             .create(
                 URL.of(

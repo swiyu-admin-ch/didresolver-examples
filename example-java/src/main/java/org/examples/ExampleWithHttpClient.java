@@ -1,13 +1,12 @@
 package org.examples;
 
 import ch.admin.bj.swiyu.didtoolbox.Ed25519VerificationMethodKeyProviderImpl;
-import ch.admin.bj.swiyu.didtoolbox.context.*;
-import ch.admin.eid.did_sidekicks.DidDoc;
-import ch.admin.eid.did_webvh.WebVerifiableHistory;
-import ch.admin.eid.did_webvh.WebVerifiableHistoryId;
+import ch.admin.bj.swiyu.didtoolbox.context.DidLogCreatorContext;
+import ch.admin.bj.swiyu.didtoolbox.context.DidLogCreatorStrategyException;
+import ch.admin.bj.swiyu.didtoolbox.model.VerificationMethod;
+import ch.admin.bj.swiyu.didtoolbox.model.VerificationMethodException;
 import ch.admin.eid.didresolver.Did;
 import ch.admin.eid.didresolver.DidResolveException;
-import ch.admin.eid.didtoolbox.TrustDidWeb;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import org.mockserver.integration.ClientAndServer;
@@ -25,12 +24,16 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Set;
 
 public class ExampleWithHttpClient {
+
+    final private static String TEST_DATA_PATH_PREFIX = "src/test/data/";
 
     private static ClientAndServer mockServer = ClientAndServer.startClientAndServer(8080);
 
@@ -78,7 +81,7 @@ public class ExampleWithHttpClient {
             did = setupMockServer();
         } catch (InvalidKeySpecException | IOException | URISyntaxException | KeyStoreException |
                  CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyException |
-                 DidLogCreatorStrategyException e) {
+                 DidLogCreatorStrategyException | VerificationMethodException e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -124,7 +127,7 @@ public class ExampleWithHttpClient {
      * Yet another handy private helper intended for testing purposes only.
      */
     private static String setupMockServer() throws IOException, URISyntaxException, InvalidKeySpecException,
-            KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyException, DidLogCreatorStrategyException {
+            KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyException, DidLogCreatorStrategyException, VerificationMethodException {
 
         // Create did with did doc
         String issuerId = "did18fa7c77-9dd1-4e20-a147-fb1bec146085";
@@ -133,24 +136,12 @@ public class ExampleWithHttpClient {
                 /*.verificationMethodKeyProvider(new Ed25519VerificationMethodKeyProviderImpl(
                         new File("src/test/data/id_ed25519"),
                         new File("src/test/data/id_ed25519.pub")))*/
-                .verificationMethodKeyProvider(new Ed25519VerificationMethodKeyProviderImpl(
-                        new FileInputStream("src/test/data/mykeystore.jks"), "changeit", "myalias", "changeit"))
-                .forceOverwrite(true) // to avoid The PEM file(s) exist(s) already and will remain intact until overwrite mode is engaged: .didtoolbox/auth-key-01
+                .cryptographicSuite(new Ed25519VerificationMethodKeyProviderImpl(
+                        new FileInputStream(TEST_DATA_PATH_PREFIX + "mykeystore.jks"), "changeit", "myalias", "changeit"))
+                .assertionMethods(Set.of(VerificationMethod.of("my-assert-key-01", Path.of(TEST_DATA_PATH_PREFIX + "assert-key-01.pub"))))
+                .authentications(Set.of(VerificationMethod.of("my-auth-key-01", Path.of(TEST_DATA_PATH_PREFIX + "auth-key-01.pub"))))
                 .build()
                 .create(URL.of(new URI(String.format("http://localhost:%d/%s", mockServer.getLocalPort(), issuerId)), null));
-
-        /*
-        var updatedDidLog = new StringBuilder(didLog)
-                .append(System.lineSeparator())
-                .append(TdwUpdater.builder()
-                        .verificationMethodKeyProvider(new Ed25519VerificationMethodKeyProviderImpl(
-                                new FileInputStream("src/test/data/mykeystore.jks"), "changeit", "myalias", "changeit"))
-                        .assertionMethodKeys(Map.of("my-assert-key-01", JwkUtils.loadECPublicJWKasJSON(new File("src/test/data/assert-key-01.pub"), "my-assert-key-01")))
-                        .authenticationKeys(Map.of("my-auth-key-01", JwkUtils.loadECPublicJWKasJSON(new File("src/test/data/auth-key-01.pub"), "my-auth-key-01")))
-                        //.updateKeys(Set.of(new File("src/test/data/public.pem")))
-                        .build()
-                        .update(initialDidLogEntry)).toString();
-         */
 
         mockServer.when(new RequestDefinition() {
             @Override
