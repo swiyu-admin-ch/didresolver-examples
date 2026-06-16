@@ -3,6 +3,6 @@
 # DID Resolver examples
 
 This project includes examples that demonstrate how to use the [DID Resolver](https://github.com/swiyu-admin-ch/didresolver) library in the following programming languages:
-- [Kotlin example](example-kotlin)
+- [Kotlin-Android example](example-kotlin-android)
 - [Java example](example-java)
 - [Swift example](example-swift)
