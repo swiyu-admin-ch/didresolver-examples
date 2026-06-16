@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Resolves the provided did and returns the did document
     fun resolve(did: String): DidDocExtended {
         // Resolve did to did doc
         val didObj = Did(did) // may throw DidResolveException
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         return didDoc
     }
 
+    // Does an https request to retrieve the did log from the server
     @Throws(IOException::class, URISyntaxException::class)
     private fun fetchDidLog(url: String): String {
         val content = StringBuilder()
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         var text: String
         try {
             val doc = resolve(did)
-            text = doc.getDidDoc().toJson()
+            text = "VerificationMethods:\n" + doc.getDidDoc().getVerificationMethod().map { it.id }.joinToString("\n")
         } catch (e: Exception) {
             Log.e("DidResolver Error", e.toString())
             text = "Something went wrong. See logs for more details."
