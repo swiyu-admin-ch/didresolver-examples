@@ -390,7 +390,7 @@
 			repositoryURL = "https://github.com/swiyu-admin-ch/jsonschema-swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.33.0;
+				minimumVersion = 0.46.4;
 			};
 		};
 		468079712E73604200512F53 /* XCRemoteSwiftPackageReference "didresolver-swift" */ = {
@@ -398,7 +398,7 @@
 			repositoryURL = "https://github.com/swiyu-admin-ch/didresolver-swift/";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.2.0;
+				minimumVersion = 2.8.2;
 			};
 		};
 		46A632412E6DB687000CD0BD /* XCRemoteSwiftPackageReference "swifter" */ = {

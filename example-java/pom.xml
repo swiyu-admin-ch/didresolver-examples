@@ -75,7 +75,7 @@
             <!-- https://central.sonatype.com/artifact/ch.admin.swiyu/didresolver -->
             <groupId>ch.admin.swiyu</groupId>
             <artifactId>didresolver</artifactId>
-            <version>2.7.0</version>
+            <version>2.8.2</version>
             <!--scope>system</scope>
             <systemPath>/Users/u80850818/Documents/GitHub/e-id-admin/didresolver-kotlin/build/libs/didresolver-kotlin-0.0.6.jar</systemPath-->
         </dependency>
@@ -89,7 +89,7 @@
             <!-- https://central.sonatype.com/artifact/ch.admin.swiyu/didtoolbox -->
             <groupId>ch.admin.swiyu</groupId>
             <artifactId>didtoolbox</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.0</version>
         </dependency>
 
     </dependencies>
