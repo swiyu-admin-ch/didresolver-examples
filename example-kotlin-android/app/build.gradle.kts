@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    implementation("ch.admin.swiyu.didresolver:didresolver-android:2.8.2@aar")
+    implementation("ch.admin.swiyu.didresolver:didresolver-android:2.9.0@aar")
     implementation("net.java.dev.jna:jna:5.17.0@aar")
 
     implementation(libs.androidx.ui)
