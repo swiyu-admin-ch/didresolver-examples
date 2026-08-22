@@ -10,13 +10,13 @@ import ch.admin.eid.didresolver.DidResolveException;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.logging.MockServerLogger;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.model.RequestDefinition;
+import org.mockserver.socket.tls.KeyStoreFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,7 +27,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Set;
 
@@ -38,40 +37,14 @@ public class ExampleWithHttpClient {
     private static ClientAndServer mockServer = ClientAndServer.startClientAndServer(8080);
 
     /**
-     * Configures SSL to trust all certificates and bypass hostname verification.
-     * This allows the application to connect to servers with untrusted or self-signed certificates.
-     * WARNING: This approach is insecure for production use.
+     * Configures TLS so that the example can reach the embedded MockServer over HTTPS by trusting
+     * MockServer's own generated CA certificate (exposed via {@link KeyStoreFactory#sslContext()}).
+     * Unlike a trust-all {@code X509TrustManager}, this keeps certificate and hostname validation
+     * fully enabled for every other endpoint, so it is safe to keep in sample code.
      */
     static {
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                        // Do nothing - trust all clients
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                        // Do nothing - trust all servers
-                    }
-                }
-        };
-
-        SSLContext sc = null;
-        try {
-            sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new RuntimeException(e);
-        }
+        SSLContext sc = new KeyStoreFactory(new MockServerLogger()).sslContext();
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 
     public static void main(String[] args) {
